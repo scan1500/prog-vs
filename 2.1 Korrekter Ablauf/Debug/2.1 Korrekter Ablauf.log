@@ -1,0 +1,2 @@
+﻿  sum.c
+c:\users\nutzer\documents\visual studio 2017\projects\vs\2.1 korrekter ablauf\sum.c(1): fatal error C1083: Datei (Include) kann nicht geöffnet werden: "pthread.h": No such file or directory

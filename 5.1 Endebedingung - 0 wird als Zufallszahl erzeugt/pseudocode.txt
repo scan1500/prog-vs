@@ -1,0 +1,62 @@
+Hinweis: Die Zahlen werden immer zuerst von "producer" erzeugt, in den Puffer abgelegt und ausgegeben.
+Danach werden die Zahlen von "consumer" aus dem Puffer genommen und ebenfalls ausgegeben. (Sync. Ausgabe)
+
+void producer(buffer)
+{
+ do
+ {
+   mutex_lock(mutex aus buffer);
+   
+   while(anz_zeichen_buffer == max_anz_zeichen_buffer) // Schleife wichtig, da Zeit zwischen laufbereit->aktiv
+	wait(buffer_not_full, mutex); // warten bis Buffer nicht voll
+   
+   zufallszahl = zufallszahl_erzeugen();
+   zufallszahl_ausgeben();
+   zufallszahl_in_buffer_speichern();
+   naechste_freie_stelle = (naechste_freie_stelle+1) % max_anz_zeichen_buffer;
+   anz_zeichen_buffer++;
+
+   signal(buffer_not_empty, mutex); // da gerade Zeichen in Buffer gelegt
+   
+   mutex_unlock(mutex aus buffer);
+ while(zufallszahl != 0);
+}
+
+void consumer(buffer)
+{
+ do
+ {
+   mutex_lock(mutex aus buffer);
+   
+   while(anz_zeichen_buffer == 0)// Schleife wichtig, da Zeit zwischen laufbereit->aktiv
+	wait(buffer_not_empty, mutex); // warten bis Buffer nicht leer
+   
+   zufallszahl = zufallszahl_aus_buffer[naechste_belegte_stelle];
+   zufallszahl_ausgeben();
+   naechste_belegte_stelle = (naechste_belegte_stelle+1) % max_anz_zeichen_buffer;
+   anz_zeichen_buffer--;
+
+   signal(buffer_not_full, mutex); // da gerade Zeichen aus Buffer genommen
+   
+   mutex_unlock(mutex aus buffer);
+ while(zufallszahl != 0);
+}
+
+void main(void)
+{
+   zeitmessung_starten();
+   buffer = buffer_erzeugen()
+
+   threads t1, t2;
+   threads_starten(t1, producer, buffer);
+   threads_starten(t2, consumer, bufffer);
+
+   threadende_erwarten(t1);
+   threadende_erwarten(t2);
+
+   zeitmessung_stoppen();
+   zeitmessung_ausgeben();
+}
+
+
+
